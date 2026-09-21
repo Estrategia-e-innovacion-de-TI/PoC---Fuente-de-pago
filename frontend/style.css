@@ -1,0 +1,249 @@
+:root {
+  --amarillo: #FFD204;
+  --verde: #00C587;
+  --naranja: #FF803A;
+  --rosa: #FFB8D2;
+  --cian: #01CDEB;
+  --oscuro: #2C2A29;
+  --fondo: #F7F7F7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--fondo);
+  color: var(--oscuro);
+}
+
+header {
+  background: var(--oscuro);
+  color: var(--fondo);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+header .marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header .marca .punto {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--amarillo);
+}
+
+header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+header .subtitulo {
+  font-size: 12px;
+  color: var(--rosa);
+}
+
+#estado-conexion {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  background: var(--amarillo);
+  color: var(--oscuro);
+  transition: filter 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secundario {
+  background: var(--cian);
+}
+
+button.peligro {
+  background: var(--naranja);
+  color: #fff;
+}
+
+button.exito {
+  background: var(--verde);
+  color: #fff;
+}
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.franja-info {
+  background: #fff;
+  border-left: 5px solid var(--cian);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tarjetas-estado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.tarjeta {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(44, 42, 41, 0.12);
+  border-top: 4px solid var(--amarillo);
+}
+
+.tarjeta.verde { border-top-color: var(--verde); }
+.tarjeta.naranja { border-top-color: var(--naranja); }
+.tarjeta.rosa { border-top-color: var(--rosa); }
+.tarjeta.cian { border-top-color: var(--cian); }
+
+.tarjeta .etiqueta {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.tarjeta .valor {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.tarjeta .valor.pequeno {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+section.panel {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(44, 42, 41, 0.12);
+}
+
+section.panel h2 {
+  margin-top: 0;
+  font-size: 16px;
+  border-bottom: 2px solid var(--fondo);
+  padding-bottom: 10px;
+}
+
+.grid-acciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.accion {
+  background: var(--fondo);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.accion h3 {
+  font-size: 13px;
+  margin: 0 0 10px;
+  color: var(--oscuro);
+}
+
+.accion label {
+  display: block;
+  font-size: 11px;
+  color: #666;
+  margin-top: 8px;
+  margin-bottom: 3px;
+}
+
+.accion input,
+.accion select {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+}
+
+.accion button {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge.si { background: var(--naranja); color: #fff; }
+.badge.no { background: var(--verde); color: #fff; }
+
+#registro-eventos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  font-size: 12.5px;
+}
+
+#registro-eventos li {
+  border-left: 3px solid var(--amarillo);
+  background: var(--fondo);
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+}
+
+#mensaje-global {
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 18px;
+}
+
+#mensaje-global.error { color: var(--naranja); font-weight: 600; }
+#mensaje-global.ok { color: var(--verde); font-weight: 600; }
+
+footer {
+  text-align: center;
+  font-size: 11px;
+  color: #999;
+  padding: 20px;
+}

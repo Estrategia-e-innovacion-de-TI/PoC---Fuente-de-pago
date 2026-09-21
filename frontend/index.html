@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fuente de Pago Inteligente · MVP</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="marca">
+    <div class="punto"></div>
+    <div>
+      <h1>Fuente de Pago Inteligente</h1>
+      <div class="subtitulo">MVP on-chain · Patrimonio Autonomo Digital</div>
+    </div>
+  </div>
+  <div id="estado-conexion">
+    <span id="cuenta-conectada">No conectado</span>
+    <button id="btn-conectar">Conectar wallet</button>
+  </div>
+</header>
+
+<main>
+
+  <div class="franja-info">
+    <strong>Principio arquitectonico:</strong> el backend recopila, concilia, integra y ejecuta.
+    El smart contract registra hechos verificables, evalua condiciones objetivas, autoriza pagos
+    y conserva la trazabilidad. Este contrato no recibe ni mueve dinero real.
+  </div>
+
+  <section class="panel">
+    <h2>Estado de la obligacion</h2>
+    <div class="tarjetas-estado" id="tarjetas-estado">
+      <div class="tarjeta"><div class="etiqueta">Identificador</div><div class="valor pequeno" id="v-id">-</div></div>
+      <div class="tarjeta naranja"><div class="etiqueta">Deuda pendiente</div><div class="valor" id="v-deuda">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Proxima cuota</div><div class="valor" id="v-cuota">-</div></div>
+      <div class="tarjeta verde"><div class="etiqueta">Recursos disponibles</div><div class="valor" id="v-recursos">-</div></div>
+      <div class="tarjeta cian"><div class="etiqueta">Reserva requerida</div><div class="valor" id="v-reserva">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Pago autorizado</div><div class="valor" id="v-autorizado">-</div></div>
+      <div class="tarjeta rosa"><div class="etiqueta">Excedente pendiente</div><div class="valor" id="v-excedente">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Recaudado historico</div><div class="valor" id="v-recaudado">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Pagado historico</div><div class="valor" id="v-pagado">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Bloqueada</div><div class="valor" id="v-bloqueada">-</div></div>
+      <div class="tarjeta"><div class="etiqueta">Cerrada</div><div class="valor" id="v-cerrada">-</div></div>
+    </div>
+    <button class="secundario" id="btn-refrescar">Refrescar estado</button>
+    <div id="mensaje-global"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Panel de administracion (backend / fiducia)</h2>
+    <p style="font-size:12px;color:#777;margin-top:-8px;">
+      Estas acciones solo pueden ejecutarse desde la cuenta registrada como <code>administrador</code> del contrato.
+    </p>
+    <div class="grid-acciones">
+
+      <div class="accion">
+        <h3>1. Crear obligacion</h3>
+        <label>Identificador</label>
+        <input id="co-id" placeholder="OBLIGACION-001" />
+        <label>Deuda inicial</label>
+        <input id="co-deuda" type="number" min="1" placeholder="1000" />
+        <label>% Reserva (>=100)</label>
+        <input id="co-reserva" type="number" min="100" placeholder="120" />
+        <button data-accion="crearObligacion">Crear obligacion</button>
+      </div>
+
+      <div class="accion">
+        <h3>2. Actualizar saldo y cuota</h3>
+        <label>Deuda pendiente</label>
+        <input id="asc-deuda" type="number" min="0" placeholder="900" />
+        <label>Proxima cuota (0 si no hay cuota pendiente)</label>
+        <input id="asc-cuota" type="number" min="0" placeholder="100" />
+        <button data-accion="actualizarSaldoYCuota">Actualizar</button>
+      </div>
+
+      <div class="accion">
+        <h3>3. Registrar recaudo conciliado</h3>
+        <label>Referencia</label>
+        <input id="rr-ref" placeholder="REC-2026-001" />
+        <label>Valor</label>
+        <input id="rr-valor" type="number" min="1" placeholder="200" />
+        <button data-accion="registrarRecaudo">Registrar recaudo</button>
+      </div>
+
+      <div class="accion">
+        <h3>5. Evaluar y autorizar pago</h3>
+        <p style="font-size:12px;color:#666;">
+          Evalua reglas objetivas (reserva, recursos, bloqueos) y autoriza el pago que el backend deberia ejecutar.
+        </p>
+        <button class="exito" data-accion="evaluarYAutorizarPago">Evaluar y autorizar</button>
+      </div>
+
+      <div class="accion">
+        <h3>6. Confirmar pago ejecutado</h3>
+        <label>Referencia de pago</label>
+        <input id="cpe-ref" placeholder="PAGO-2026-001" />
+        <button data-accion="confirmarPagoEjecutado">Confirmar pago</button>
+      </div>
+
+      <div class="accion">
+        <h3>7. Cancelar autorizacion</h3>
+        <p style="font-size:12px;color:#666;">Usar si el backend no pudo ejecutar el pago autorizado.</p>
+        <button class="peligro" data-accion="cancelarAutorizacion">Cancelar autorizacion</button>
+      </div>
+
+      <div class="accion">
+        <h3>8. Confirmar giro de excedente</h3>
+        <label>Referencia de giro</label>
+        <input id="cge-ref" placeholder="GIRO-2026-001" />
+        <button data-accion="confirmarGiroExcedente">Confirmar giro</button>
+      </div>
+
+      <div class="accion">
+        <h3>9. Registrar evidencia</h3>
+        <label>Texto o identificador del documento</label>
+        <input id="re-texto" placeholder="contrato-firmado.pdf" />
+        <label>Tipo</label>
+        <input id="re-tipo" placeholder="contrato / paz_y_salvo / comprobante" />
+        <button data-accion="registrarEvidencia">Registrar evidencia (hash)</button>
+      </div>
+
+      <div class="accion">
+        <h3>10. Bloqueo operativo</h3>
+        <label>Motivo</label>
+        <input id="ab-motivo" placeholder="Revision de cumplimiento" />
+        <button class="peligro" data-accion="bloquear">Bloquear</button>
+        <button class="exito" data-accion="desbloquear" style="margin-top:8px;">Desbloquear</button>
+      </div>
+
+      <div class="accion">
+        <h3>11-12. Paz y salvo / Cierre</h3>
+        <button data-accion="registrarPazYSalvo">Registrar paz y salvo</button>
+        <button class="secundario" data-accion="cerrarObligacion" style="margin-top:8px;">Cerrar obligacion</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Registro de eventos on-chain</h2>
+    <ul id="registro-eventos"></ul>
+  </section>
+
+</main>
+
+<footer>MVP demostrativo · No custodia fondos · Fuente de Pago Inteligente</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,874 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_administrador",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "CuotaSuperaDeuda",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "DireccionInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EvidenciaDuplicada",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GiroExcedenteDuplicado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoAutorizado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ObligacionBloqueadaError",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ObligacionCerradaError",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ObligacionInexistente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ObligacionYaExiste",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PagoAutorizadoPendiente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PagoDuplicado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PazYSalvoFaltante",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RecaudoDuplicado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RecursosInsuficientes",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RecursosPorGestionar",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReservaInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SaldoPendienteExiste",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SinAutorizacionVigente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SinExcedenteDisponible",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ValorInvalido",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      }
+    ],
+    "name": "AutorizacionCancelada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "bloqueada",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "motivo",
+        "type": "string"
+      }
+    ],
+    "name": "BloqueoActualizado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "hash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "tipo",
+        "type": "string"
+      }
+    ],
+    "name": "EvidenciaRegistrada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExcedenteDisponible",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "referencia",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExcedenteGirado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "identificador",
+        "type": "string"
+      }
+    ],
+    "name": "ObligacionCerrada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "identificador",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "deudaInicial",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "porcentajeReserva",
+        "type": "uint256"
+      }
+    ],
+    "name": "ObligacionCreada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "pagoParcial",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "reservaCumplida",
+        "type": "bool"
+      }
+    ],
+    "name": "PagoAutorizadoEvento",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "referencia",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "nuevaDeudaPendiente",
+        "type": "uint256"
+      }
+    ],
+    "name": "PagoEjecutado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "motivo",
+        "type": "string"
+      }
+    ],
+    "name": "PagoNoAutorizado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "PazYSalvoRegistrado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "referencia",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valor",
+        "type": "uint256"
+      }
+    ],
+    "name": "RecaudoRegistrado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "motivo",
+        "type": "string"
+      }
+    ],
+    "name": "RevisionManualRequerida",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "deudaPendiente",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "proximaCuota",
+        "type": "uint256"
+      }
+    ],
+    "name": "SaldoYCuotaActualizados",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_bloqueada",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "_motivo",
+        "type": "string"
+      }
+    ],
+    "name": "actualizarBloqueo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_deudaPendiente",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_proximaCuota",
+        "type": "uint256"
+      }
+    ],
+    "name": "actualizarSaldoYCuota",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "administrador",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "calcularExcedente",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "calcularReservaRequerida",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelarAutorizacion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cerrarObligacion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_referenciaGiro",
+        "type": "string"
+      }
+    ],
+    "name": "confirmarGiroExcedente",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_referenciaPago",
+        "type": "string"
+      }
+    ],
+    "name": "confirmarPagoEjecutado",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "consultarEstado",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deuda",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cuota",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "recursos",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reservaRequerida",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "autorizado",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "excedente",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "recaudadoHistorico",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pagadoHistorico",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "bloqueada",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "cerrada",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_identificador",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_deudaInicial",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_porcentajeReserva",
+        "type": "uint256"
+      }
+    ],
+    "name": "crearObligacion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deudaPendiente",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "evaluarYAutorizarPago",
+    "outputs": [
+      {
+        "internalType": "enum FuentePagoDemo.ResultadoEvaluacion",
+        "name": "resultado",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "valorAutorizado",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "evidenciasRegistradas",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "excedentePendienteGiro",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "girosExcedenteRegistrados",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "identificador",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "obligacionBloqueada",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "obligacionCerrada",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "obligacionCreada",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pagoAutorizado",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "pagosRegistrados",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pazYSalvoRegistrado",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "porcentajeReserva",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proximaCuota",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "recaudosRegistrados",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "recursosDisponibles",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_hash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "_tipo",
+        "type": "string"
+      }
+    ],
+    "name": "registrarEvidencia",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "registrarPazYSalvo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_referencia",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_valor",
+        "type": "uint256"
+      }
+    ],
+    "name": "registrarRecaudo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalExcedentesGirados",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalPagado",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalRecaudado",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
