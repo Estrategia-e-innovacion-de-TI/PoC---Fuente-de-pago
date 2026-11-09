@@ -170,6 +170,43 @@ section.panel h2 {
   gap: 16px;
 }
 
+.gestion-obligaciones {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.gestion-obligaciones h2 { font-size: 16px; }
+.gestion-obligaciones label { display: block; font-size: 12px; margin-bottom: 6px; }
+.gestion-obligaciones input,
+.gestion-obligaciones select {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  background: #fff;
+  color: var(--oscuro);
+  font: inherit;
+  font-size: 13px;
+}
+.selector-obligacion,
+.form-nueva {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+.form-nueva { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; margin-top: 14px; }
+.detalle-obligacion { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 12px 0 18px; font-size: 12px; }
+.detalle-obligacion code { overflow-wrap: anywhere; min-width: 0; }
+.gestion-obligaciones summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+
+@media (max-width: 640px) {
+  .selector-obligacion, .form-nueva { grid-template-columns: minmax(0, 1fr); }
+  .gestion-obligaciones button { width: 100%; }
+}
+
 .accion {
   background: var(--fondo);
   border-radius: 8px;

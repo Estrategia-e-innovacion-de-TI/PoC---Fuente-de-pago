@@ -14,12 +14,26 @@ const TIPOS_MIME = {
 };
 
 const servidor = http.createServer((req, res) => {
-  let rutaSolicitada = req.url === "/" ? "/index.html" : req.url;
-  rutaSolicitada = decodeURIComponent(rutaSolicitada.split("?")[0]);
+  let rutaSolicitada;
+  try {
+    rutaSolicitada = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+  } catch {
+    res.writeHead(400);
+    res.end("Solicitud invalida");
+    return;
+  }
 
-  const rutaAbsoluta = path.join(RAIZ, rutaSolicitada);
+  if (rutaSolicitada === "/") {
+    rutaSolicitada = "/index.html";
+  }
 
-  if (!rutaAbsoluta.startsWith(RAIZ)) {
+  const rutaAbsoluta = path.resolve(RAIZ, `.${rutaSolicitada}`);
+  const rutaRelativa = path.relative(RAIZ, rutaAbsoluta);
+  if (
+    rutaRelativa === ".." ||
+    rutaRelativa.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(rutaRelativa)
+  ) {
     res.writeHead(403);
     res.end("Prohibido");
     return;

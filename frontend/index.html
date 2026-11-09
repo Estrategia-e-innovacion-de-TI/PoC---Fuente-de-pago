@@ -30,6 +30,35 @@
     y conserva la trazabilidad. Este contrato no recibe ni mueve dinero real.
   </div>
 
+  <section class="gestion-obligaciones" aria-labelledby="titulo-obligaciones">
+    <h2 id="titulo-obligaciones">Obligaciones</h2>
+    <div class="selector-obligacion">
+      <div>
+        <label for="obligacion-select">Obligacion activa</label>
+        <select id="obligacion-select" disabled></select>
+      </div>
+      <button id="btn-listar" class="secundario" disabled>Actualizar listado</button>
+    </div>
+    <div class="detalle-obligacion">
+      <span id="estado-inicializacion">-</span>
+      <code id="direccion-obligacion">-</code>
+    </div>
+    <details>
+      <summary>Nueva obligacion</summary>
+      <div class="form-nueva">
+        <div>
+          <label for="nueva-id">Identificador unico</label>
+          <input id="nueva-id" placeholder="OBLIGACION-002" />
+        </div>
+        <div>
+          <label for="nueva-admin">Administrador</label>
+          <input id="nueva-admin" placeholder="0x..." spellcheck="false" />
+        </div>
+        <button id="btn-desplegar" disabled>Desplegar obligacion</button>
+      </div>
+    </details>
+  </section>
+
   <section class="panel">
     <h2>Estado de la obligacion</h2>
     <div class="tarjetas-estado" id="tarjetas-estado">
@@ -37,7 +66,7 @@
       <div class="tarjeta naranja"><div class="etiqueta">Deuda pendiente</div><div class="valor" id="v-deuda">-</div></div>
       <div class="tarjeta"><div class="etiqueta">Proxima cuota</div><div class="valor" id="v-cuota">-</div></div>
       <div class="tarjeta verde"><div class="etiqueta">Recursos disponibles</div><div class="valor" id="v-recursos">-</div></div>
-      <div class="tarjeta cian"><div class="etiqueta">Reserva requerida</div><div class="valor" id="v-reserva">-</div></div>
+      <div class="tarjeta cian"><div class="etiqueta">Reserva adicional</div><div class="valor" id="v-reserva">-</div></div>
       <div class="tarjeta"><div class="etiqueta">Pago autorizado</div><div class="valor" id="v-autorizado">-</div></div>
       <div class="tarjeta rosa"><div class="etiqueta">Excedente pendiente</div><div class="valor" id="v-excedente">-</div></div>
       <div class="tarjeta"><div class="etiqueta">Recaudado historico</div><div class="valor" id="v-recaudado">-</div></div>
@@ -57,21 +86,21 @@
     <div class="grid-acciones">
 
       <div class="accion">
-        <h3>1. Crear obligacion</h3>
+        <h3>1. Inicializar obligacion</h3>
         <label>Identificador</label>
-        <input id="co-id" placeholder="OBLIGACION-001" />
+        <input id="co-id" placeholder="OBLIGACION-001" readonly />
         <label>Deuda inicial</label>
         <input id="co-deuda" type="number" min="1" placeholder="1000" />
-        <label>% Reserva (>=100)</label>
+        <label>Cobertura de cuota (%)</label>
         <input id="co-reserva" type="number" min="100" placeholder="120" />
-        <button data-accion="crearObligacion">Crear obligacion</button>
+        <button data-accion="crearObligacion">Inicializar obligacion</button>
       </div>
 
       <div class="accion">
-        <h3>2. Actualizar saldo y cuota</h3>
+        <h3>2. Configurar saldo y cuota fija</h3>
         <label>Deuda pendiente</label>
         <input id="asc-deuda" type="number" min="0" placeholder="900" />
-        <label>Proxima cuota (0 si no hay cuota pendiente)</label>
+        <label>Cuota fija (0 para pausar)</label>
         <input id="asc-cuota" type="number" min="0" placeholder="100" />
         <button data-accion="actualizarSaldoYCuota">Actualizar</button>
       </div>

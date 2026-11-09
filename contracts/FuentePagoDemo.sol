@@ -31,11 +31,13 @@ contract FuentePagoDemo {
     error ValorInvalido();
     error ReservaInvalida();
     error CuotaSuperaDeuda();
+    error SaldoYCuotaDesactualizados();
     error PagoAutorizadoPendiente();
     error RecaudoDuplicado();
     error PagoDuplicado();
     error SinAutorizacionVigente();
     error RecursosInsuficientes();
+    error ExcedenteDesactualizado();
     error SaldoPendienteExiste();
     error PazYSalvoFaltante();
     error RecursosPorGestionar();
@@ -57,6 +59,7 @@ contract FuentePagoDemo {
 
     uint256 public deudaPendiente;
     uint256 public proximaCuota;
+    uint256 public cuotaFija;
 
     // Por ejemplo: 120 representa una reserva del 120 %
     uint256 public porcentajeReserva;
@@ -79,6 +82,7 @@ contract FuentePagoDemo {
     bool public obligacionBloqueada;
     bool public pazYSalvoRegistrado;
     bool public obligacionCerrada;
+    bool public requiereActualizarSaldoYCuota;
 
     // Evita registrar dos veces el mismo recaudo
     mapping(bytes32 => bool) public recaudosRegistrados;
@@ -151,6 +155,11 @@ contract FuentePagoDemo {
         uint256 valor
     );
 
+    event ExcedentePendienteAjustado(
+        uint256 valorAnterior,
+        uint256 valorNuevo
+    );
+
     event ExcedenteGirado(
         bytes32 referencia,
         uint256 valor
@@ -167,6 +176,8 @@ contract FuentePagoDemo {
     );
 
     event PazYSalvoRegistrado();
+
+    event PazYSalvoInvalidado();
 
     event ObligacionCerrada(
         string identificador
@@ -236,8 +247,22 @@ contract FuentePagoDemo {
         // (por ejemplo, deuda ya cubierta o entre ciclos de facturacion).
         if (_proximaCuota > _deudaPendiente) revert CuotaSuperaDeuda();
 
+        if (pazYSalvoRegistrado && _deudaPendiente != 0) {
+            pazYSalvoRegistrado = false;
+            emit PazYSalvoInvalidado();
+        }
+
         deudaPendiente = _deudaPendiente;
         proximaCuota = _proximaCuota;
+        cuotaFija = _proximaCuota;
+        requiereActualizarSaldoYCuota = false;
+
+        uint256 excedenteSeguro = calcularExcedente();
+        if (excedentePendienteGiro > excedenteSeguro) {
+            uint256 excedenteAnterior = excedentePendienteGiro;
+            excedentePendienteGiro = excedenteSeguro;
+            emit ExcedentePendienteAjustado(excedenteAnterior, excedenteSeguro);
+        }
 
         emit SaldoYCuotaActualizados(
             _deudaPendiente,
@@ -292,7 +317,7 @@ contract FuentePagoDemo {
             return 0;
         }
 
-        return (proximaCuota * porcentajeReserva) / 100;
+        return (minimo(cuotaFija, deudaPendiente) * (porcentajeReserva - 100)) / 100;
     }
 
     // =========================================================
@@ -302,9 +327,9 @@ contract FuentePagoDemo {
     /**
      * Regla demostrativa:
      * 1. Obligacion bloqueada -> RevisionManualRequerida (no autoriza).
-     * 2. Recursos cubren la reserva requerida -> pago total.
-     * 3. Recursos no cubren la reserva pero existen -> pago parcial.
-     * 4. No existen recursos -> PagoNoAutorizado.
+     * 2. Se preserva la reserva requerida antes de autorizar un pago.
+     * 3. Se paga la cuota con el excedente sobre la reserva, total o parcial.
+     * 4. Si no hay recursos por encima de la reserva -> PagoNoAutorizado.
      *
      * La autorizacion no mueve dinero.
      */
@@ -325,20 +350,30 @@ contract FuentePagoDemo {
             return (ResultadoEvaluacion.RevisionManualRequerida, 0);
         }
 
+        if (requiereActualizarSaldoYCuota) {
+            revert SaldoYCuotaDesactualizados();
+        }
+
         uint256 reservaRequerida = calcularReservaRequerida();
 
-        // No hay cuota pendiente por autorizar (deuda ya cubierta o sin
-        // cuota vigente). Se liberan como excedente los recursos que ya
-        // no estan comprometidos con ninguna reserva.
+        // Si hay deuda pero no cuota vigente, se conservan los recursos para
+        // una cuota futura. Solo se libera el remanente cuando la deuda es cero.
         if (proximaCuota == 0 || deudaPendiente == 0) {
-            _detectarExcedente(reservaRequerida);
+            if (deudaPendiente == 0) {
+                _detectarExcedente(reservaRequerida);
+            }
             emit PagoNoAutorizado("No hay cuota pendiente por autorizar");
             return (ResultadoEvaluacion.PagoNoAutorizado, 0);
         }
 
-        // Caso 1: cumple la reserva -> pago total
-        if (recursosDisponibles >= reservaRequerida) {
-            valorAutorizado = minimo(proximaCuota, deudaPendiente);
+        uint256 pagoMaximo = minimo(proximaCuota, deudaPendiente);
+        uint256 recursosParaPago = recursosDisponibles > reservaRequerida
+            ? recursosDisponibles - reservaRequerida
+            : 0;
+
+        // Caso 1: se puede pagar la cuota completa y conservar la reserva.
+        if (recursosParaPago >= pagoMaximo) {
+            valorAutorizado = pagoMaximo;
             pagoAutorizado = valorAutorizado;
 
             emit PagoAutorizadoEvento(valorAutorizado, false, true);
@@ -348,18 +383,18 @@ contract FuentePagoDemo {
             return (ResultadoEvaluacion.PagoAutorizado, valorAutorizado);
         }
 
-        // Caso 2: pago parcial con lo disponible (reserva insuficiente)
-        if (recursosDisponibles > 0) {
-            valorAutorizado = minimo(recursosDisponibles, deudaPendiente);
+        // Caso 2: se autoriza solo el excedente sobre la reserva.
+        if (recursosParaPago > 0) {
+            valorAutorizado = minimo(recursosParaPago, pagoMaximo);
             pagoAutorizado = valorAutorizado;
 
-            emit PagoAutorizadoEvento(valorAutorizado, true, false);
+            emit PagoAutorizadoEvento(valorAutorizado, true, true);
 
             return (ResultadoEvaluacion.PagoParcialAutorizado, valorAutorizado);
         }
 
-        // Caso 3: no hay recursos
-        emit PagoNoAutorizado("No existen recursos disponibles");
+        // Caso 3: no hay recursos disponibles por encima de la reserva.
+        emit PagoNoAutorizado("Los recursos no superan la reserva requerida");
 
         return (ResultadoEvaluacion.PagoNoAutorizado, 0);
     }
@@ -396,12 +431,24 @@ contract FuentePagoDemo {
         totalPagado += valorEjecutado;
 
         pagoAutorizado = 0;
+        proximaCuota = valorEjecutado < proximaCuota
+            ? minimo(proximaCuota - valorEjecutado, deudaPendiente)
+            : minimo(cuotaFija, deudaPendiente);
+        requiereActualizarSaldoYCuota = false;
+
+        uint256 excedenteSeguro = calcularExcedente();
+        if (excedentePendienteGiro > excedenteSeguro) {
+            uint256 excedenteAnterior = excedentePendienteGiro;
+            excedentePendienteGiro = excedenteSeguro;
+            emit ExcedentePendienteAjustado(excedenteAnterior, excedenteSeguro);
+        }
 
         emit PagoEjecutado(
             referenciaHash,
             valorEjecutado,
             deudaPendiente
         );
+        emit SaldoYCuotaActualizados(deudaPendiente, proximaCuota);
     }
 
     // =========================================================
@@ -438,6 +485,10 @@ contract FuentePagoDemo {
         view
         returns (uint256)
     {
+        if (deudaPendiente != 0 && proximaCuota == 0) {
+            return 0;
+        }
+
         uint256 reservaRequerida = calcularReservaRequerida();
         uint256 comprometido = reservaRequerida + pagoAutorizado;
 
@@ -481,6 +532,7 @@ contract FuentePagoDemo {
         bytes32 referenciaHash = keccak256(bytes(_referenciaGiro));
 
         if (girosExcedenteRegistrados[referenciaHash]) revert GiroExcedenteDuplicado();
+        if (excedentePendienteGiro > calcularExcedente()) revert ExcedenteDesactualizado();
         if (recursosDisponibles < excedentePendienteGiro) revert RecursosInsuficientes();
 
         girosExcedenteRegistrados[referenciaHash] = true;
@@ -568,6 +620,7 @@ contract FuentePagoDemo {
 
         if (deudaPendiente != 0) revert SaldoPendienteExiste();
         if (!pazYSalvoRegistrado) revert PazYSalvoFaltante();
+        if (obligacionBloqueada) revert ObligacionBloqueadaError();
         if (recursosDisponibles != 0) revert RecursosPorGestionar();
         if (excedentePendienteGiro != 0) revert RecursosPorGestionar();
 

@@ -27,6 +27,11 @@
   },
   {
     "inputs": [],
+    "name": "ExcedenteDesactualizado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "GiroExcedenteDuplicado",
     "type": "error"
   },
@@ -93,6 +98,11 @@
   {
     "inputs": [],
     "name": "SaldoPendienteExiste",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SaldoYCuotaDesactualizados",
     "type": "error"
   },
   {
@@ -198,6 +208,25 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "valorAnterior",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "valorNuevo",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExcedentePendienteAjustado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "string",
         "name": "identificador",
         "type": "string"
@@ -292,6 +321,12 @@
       }
     ],
     "name": "PagoNoAutorizado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "PazYSalvoInvalidado",
     "type": "event"
   },
   {
@@ -550,6 +585,19 @@
     "name": "crearObligacion",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cuotaFija",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -830,6 +878,19 @@
     "name": "registrarRecaudo",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "requiereActualizarSaldoYCuota",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
